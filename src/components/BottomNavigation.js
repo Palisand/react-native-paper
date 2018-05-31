@@ -46,6 +46,18 @@ type Props<T> = {
    */
   labeled?: boolean,
   /**
+   * Label interpolation output range for focus state.
+   */
+  labelOutputRange: [number, number],
+  /**
+   * Style for label container.
+   */
+  labelContainerStyle?: any,
+  /**
+   * Value of allowFontScaling prop for label Text component.
+   */
+  labelAllowFontScaling: boolean,
+  /**
    * State for the bottom navigation. The state should contain the following properties:
    *
    * - `index`: a number reprsenting the index of the active route in the `routes` array
@@ -295,6 +307,8 @@ class BottomNavigation<T: *> extends React.Component<Props<T>, State> {
 
   static defaultProps = {
     labeled: true,
+    labelOutputRange: [10, 0],
+    labelAllowFontScaling: true,
   };
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -445,6 +459,9 @@ class BottomNavigation<T: *> extends React.Component<Props<T>, State> {
       inactiveTintColor,
       barStyle,
       labeled,
+      labelOutputRange,
+      labelContainerStyle,
+      labelAllowFontScaling,
       style,
       theme,
     } = this.props;
@@ -596,10 +613,10 @@ class BottomNavigation<T: *> extends React.Component<Props<T>, State> {
                 ? shifting
                   ? focused.interpolate({
                       inputRange: [0, 1],
-                      outputRange: [10, 0],
+                      outputRange: labelOutputRange,
                     })
-                  : 0
-                : 10;
+                  : labelOutputRange[1]
+                : labelOutputRange[0];
 
               // We render the active icon and label on top of inactive ones and cross-fade them on change.
               // This trick gives the illusion that we are animating between active and inactive colors.
@@ -667,6 +684,7 @@ class BottomNavigation<T: *> extends React.Component<Props<T>, State> {
                       <Animated.View
                         style={[
                           styles.labelContainer,
+                          labelContainerStyle,
                           {
                             transform: [{ scale }],
                           },
@@ -686,6 +704,7 @@ class BottomNavigation<T: *> extends React.Component<Props<T>, State> {
                             })
                           ) : (
                             <AnimatedText
+                              allowFontScaling={labelAllowFontScaling}
                               style={[
                                 styles.label,
                                 {
